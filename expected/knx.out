@@ -23,6 +23,24 @@ SELECT '17/6/1'::knx_group_address3;
  17/6/1
 (1 row)
 
+SELECT '1/0/0'::knx_group_address3;
+ knx_group_address3 
+--------------------
+ 1/0/0
+(1 row)
+
+SELECT '0/1/0'::knx_group_address3;
+ knx_group_address3 
+--------------------
+ 0/1/0
+(1 row)
+
+SELECT '0/0/1'::knx_group_address3;
+ knx_group_address3 
+--------------------
+ 0/0/1
+(1 row)
+
 SELECT '00FA'::knx_group_address3;
  knx_group_address3 
 --------------------
@@ -45,6 +63,18 @@ SELECT '29/2012'::knx_group_address2;
  knx_group_address2 
 --------------------
  29/2012
+(1 row)
+
+SELECT '1/0'::knx_group_address2;
+ knx_group_address2 
+--------------------
+ 1/0
+(1 row)
+
+SELECT '0/1'::knx_group_address2;
+ knx_group_address2 
+--------------------
+ 0/1
 (1 row)
 
 SELECT '02E7'::knx_group_address2;
@@ -71,12 +101,21 @@ SELECT '12A5'::knx_individual_address;
  1.2.165
 (1 row)
 
+SELECT '0x1145'::knx_individual_address;
+ knx_individual_address 
+------------------------
+ 1.1.69
+(1 row)
+
 SELECT 2000::knx_individual_address;
  knx_individual_address 
 ------------------------
  0.7.208
 (1 row)
 
+--
+-- test casts
+--
 SELECT ('00FA'::knx_group_address3)::integer;
  int4 
 ------
@@ -114,6 +153,14 @@ SELECT '31/1/300'::knx_group_address3;
 ERROR:  invalid group address format/values 31/1/300
 LINE 1: SELECT '31/1/300'::knx_group_address3;
                ^
+SELECT '3300FA'::knx_group_address3;
+ERROR:  invalid group address format/values 3300FA
+LINE 1: SELECT '3300FA'::knx_group_address3;
+               ^
+SELECT 65000165::knx_group_address3;
+ERROR:  integer out of range
+SELECT 0::knx_group_address3;
+ERROR:  address cannot be zero
 SELECT '17/2050'::knx_group_address2;
 ERROR:  invalid group address format/values 17/2050
 LINE 1: SELECT '17/2050'::knx_group_address2;
@@ -126,19 +173,15 @@ SELECT '0x0000'::knx_group_address2;
 ERROR:  invalid group address format/values 0x0000
 LINE 1: SELECT '0x0000'::knx_group_address2;
                ^
-SELECT '3300FA'::knx_group_address3;
-ERROR:  invalid group address format/values 3300FA
-LINE 1: SELECT '3300FA'::knx_group_address3;
-               ^
-SELECT 65000165::knx_group_address3;
-ERROR:  integer out of range
-SELECT 0::knx_group_address3;
-ERROR:  address cannot be zero
 SELECT 0::knx_individual_address;
 ERROR:  address cannot be zero
 SELECT '0.0.0'::knx_individual_address;
 ERROR:  invalid individual address format/values 0.0.0
 LINE 1: SELECT '0.0.0'::knx_individual_address;
+               ^
+SELECT '0x0'::knx_individual_address;
+ERROR:  invalid individual address format/values 0x0
+LINE 1: SELECT '0x0'::knx_individual_address;
                ^
 SELECT '16.0.1'::knx_individual_address;
 ERROR:  invalid individual address format/values 16.0.1

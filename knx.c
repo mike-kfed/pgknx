@@ -42,20 +42,20 @@ string2group_addr(const char *addr, bool errorOK, knx_addr *result,
 		   enum knx_type accept)
 {
 	unsigned int a=0, b=0, c=0, res;
-	res = sscanf (addr, "%u/%u/%u", &a, &b, &c);
+	res = sscanf(addr, "%u/%u/%u", &a, &b, &c);
 	if (res == 3 && a <= 0x1F && b <= 0x07 && c <= 0xFF
-			&& a > 0 && b > 0 && c > 0)
+			&& (a > 0 || b > 0 || c > 0))
 	{
 		*result = (a << 11) | (b << 8) | c;
 		return true;
 	}
 	if (res == 2 && a <= 0x1F && b <= 0x7FF
-			&& a > 0 && b > 0)
+			&& (a > 0 || b > 0))
 	{
 		*result = (a << 11) | (b & 0x7FF);
 		return true;
 	}
-	if (res == 1 && sscanf (addr, "%x", &a) == 1 && a <= 0xFFFF
+	if (res == 1 && sscanf(addr, "%x", &a) == 1 && a <= 0xFFFF
 			&& a > 0)
 	{
 		*result = a;
@@ -71,8 +71,8 @@ static bool
 string2individual_addr(const char *addr, bool errorOK, knx_addr *result)
 {
 	unsigned int a=0, b=0, c=0, res;
-	res = sscanf (addr, "%u.%u.%u", &a, &b, &c);
-	if (a == 0 && b == 0 && c == 0)
+	res = sscanf(addr, "%u.%u.%u", &a, &b, &c);
+	if (res == 3 && a == 0 && b == 0 && c == 0)
 		goto kaputt;
 	if (res == 3 && (a > 15 || b > 15 || c > 255))
 		goto kaputt;
@@ -81,8 +81,8 @@ string2individual_addr(const char *addr, bool errorOK, knx_addr *result)
 		*result = ((a & 0x0f) << 12) | ((b & 0x0f) << 8) | ((c & 0xff));
 		return true;
 	}
-	res = sscanf (addr, "%x", &a);
-	if (res == 1)
+	res = sscanf(addr, "%x", &a);
+	if (res == 1 && a > 0)
 	{
 		*result = a & 0xffff;
 		return true;
