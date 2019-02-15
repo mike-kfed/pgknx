@@ -1,0 +1,5 @@
+# knx extension
+comment = 'data types for KNX Addresses'
+default_version = '1.0'
+module_pathname = '$libdir/knx'
+relocatable = true

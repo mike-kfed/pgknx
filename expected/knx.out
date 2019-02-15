@@ -1,0 +1,158 @@
+--
+-- Test KNX extension
+--
+CREATE EXTENSION knx;
+-- Check whether any of our opclasses fail amvalidate
+-- ... they will, because of missing cross-type operators
+SELECT amname, opcname
+FROM (SELECT amname, opcname, opc.oid
+      FROM pg_opclass opc LEFT JOIN pg_am am ON am.oid = opcmethod
+      WHERE opc.oid >= 16384
+      ORDER BY 1, 2 OFFSET 0) ss
+WHERE NOT amvalidate(oid);
+ amname | opcname 
+--------+---------
+(0 rows)
+
+--
+-- test valid conversions
+--
+SELECT '17/6/1'::knx_group_address3;
+ knx_group_address3 
+--------------------
+ 17/6/1
+(1 row)
+
+SELECT '00FA'::knx_group_address3;
+ knx_group_address3 
+--------------------
+ 0/0/250
+(1 row)
+
+SELECT '0xA0FA'::knx_group_address3;
+ knx_group_address3 
+--------------------
+ 20/0/250
+(1 row)
+
+SELECT 165::knx_group_address3;
+ knx_group_address3 
+--------------------
+ 0/0/165
+(1 row)
+
+SELECT '29/2012'::knx_group_address2;
+ knx_group_address2 
+--------------------
+ 29/2012
+(1 row)
+
+SELECT '02E7'::knx_group_address2;
+ knx_group_address2 
+--------------------
+ 0/743
+(1 row)
+
+SELECT 165::knx_group_address2;
+ knx_group_address2 
+--------------------
+ 0/165
+(1 row)
+
+SELECT '4.3.250'::knx_individual_address;
+ knx_individual_address 
+------------------------
+ 4.3.250
+(1 row)
+
+SELECT '12A5'::knx_individual_address;
+ knx_individual_address 
+------------------------
+ 1.2.165
+(1 row)
+
+SELECT 2000::knx_individual_address;
+ knx_individual_address 
+------------------------
+ 0.7.208
+(1 row)
+
+SELECT ('00FA'::knx_group_address3)::integer;
+ int4 
+------
+  250
+(1 row)
+
+SELECT ('00FA'::knx_group_address2)::integer;
+ int4 
+------
+  250
+(1 row)
+
+SELECT ('12A5'::knx_individual_address)::integer;
+ int4 
+------
+ 4773
+(1 row)
+
+--
+-- test invalid
+--
+SELECT '32/1/2'::knx_group_address3;
+ERROR:  invalid group address format/values 32/1/2
+LINE 1: SELECT '32/1/2'::knx_group_address3;
+               ^
+SELECT '0/0/0'::knx_group_address3;
+ERROR:  invalid group address format/values 0/0/0
+LINE 1: SELECT '0/0/0'::knx_group_address3;
+               ^
+SELECT '31/8/23'::knx_group_address3;
+ERROR:  invalid group address format/values 31/8/23
+LINE 1: SELECT '31/8/23'::knx_group_address3;
+               ^
+SELECT '31/1/300'::knx_group_address3;
+ERROR:  invalid group address format/values 31/1/300
+LINE 1: SELECT '31/1/300'::knx_group_address3;
+               ^
+SELECT '17/2050'::knx_group_address2;
+ERROR:  invalid group address format/values 17/2050
+LINE 1: SELECT '17/2050'::knx_group_address2;
+               ^
+SELECT '0000'::knx_group_address2;
+ERROR:  invalid group address format/values 0000
+LINE 1: SELECT '0000'::knx_group_address2;
+               ^
+SELECT '0x0000'::knx_group_address2;
+ERROR:  invalid group address format/values 0x0000
+LINE 1: SELECT '0x0000'::knx_group_address2;
+               ^
+SELECT '3300FA'::knx_group_address3;
+ERROR:  invalid group address format/values 3300FA
+LINE 1: SELECT '3300FA'::knx_group_address3;
+               ^
+SELECT 65000165::knx_group_address3;
+ERROR:  integer out of range
+SELECT 0::knx_group_address3;
+ERROR:  address cannot be zero
+SELECT 0::knx_individual_address;
+ERROR:  address cannot be zero
+SELECT '0.0.0'::knx_individual_address;
+ERROR:  invalid individual address format/values 0.0.0
+LINE 1: SELECT '0.0.0'::knx_individual_address;
+               ^
+SELECT '16.0.1'::knx_individual_address;
+ERROR:  invalid individual address format/values 16.0.1
+LINE 1: SELECT '16.0.1'::knx_individual_address;
+               ^
+SELECT '15.16.1'::knx_individual_address;
+ERROR:  invalid individual address format/values 15.16.1
+LINE 1: SELECT '15.16.1'::knx_individual_address;
+               ^
+SELECT '15.12.256'::knx_individual_address;
+ERROR:  invalid individual address format/values 15.12.256
+LINE 1: SELECT '15.12.256'::knx_individual_address;
+               ^
+--
+-- cleanup
+--
+DROP EXTENSION knx;
