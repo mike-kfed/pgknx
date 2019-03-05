@@ -64,6 +64,17 @@ SELECT '16.0.1'::knx_individual_address;
 SELECT '15.16.1'::knx_individual_address;
 SELECT '15.12.256'::knx_individual_address;
 
+--
+-- test op classes
+--
+create table knx_test(
+	a knx_group_address3 primary key,
+	b knx_group_address2,
+	c knx_individual_address
+);
+create index on knx_test(b);
+create index on knx_test(c);
+drop table knx_test;
 
 --
 -- cleanup
