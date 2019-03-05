@@ -9,7 +9,7 @@
  */
 
 #include "postgres.h"
-
+#include "libpq/pqformat.h"
 #include "fmgr.h"
 #include "utils/builtins.h"
 
@@ -249,4 +249,25 @@ knx_ia_in(PG_FUNCTION_ARGS)
 
 	(void) string2individual_addr(str, false, &result);
 	PG_RETURN_KNX_ADDR(result);
+}
+
+/* binary send/receive protocol */
+PG_FUNCTION_INFO_V1(knx_addr_recv);
+Datum
+knx_addr_recv(PG_FUNCTION_ARGS)
+{
+    StringInfo  buf = (StringInfo) PG_GETARG_POINTER(0);
+    PG_RETURN_KNX_ADDR((knx_addr) pq_getmsgint(buf, sizeof(knx_addr)));
+}
+
+PG_FUNCTION_INFO_V1(knx_addr_send);
+Datum
+knx_addr_send(PG_FUNCTION_ARGS)
+{
+    uint16      arg1 = PG_GETARG_KNX_ADDR(0);
+    StringInfoData buf;
+
+    pq_begintypsend(&buf);
+    pq_sendint(&buf, arg1, sizeof(knx_addr));
+    PG_RETURN_BYTEA_P(pq_endtypsend(&buf));
 }

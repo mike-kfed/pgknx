@@ -43,6 +43,13 @@ SELECT ('00FA'::knx_group_address2)::integer;
 SELECT ('12A5'::knx_individual_address)::integer;
 
 --
+-- test binary send
+--
+SELECT knx_ga3_send('00FA'::knx_group_address3);
+SELECT knx_ga2_send('00FA'::knx_group_address2);
+SELECT knx_ia_send('00FA'::knx_individual_address);
+
+--
 -- test invalid
 --
 SELECT '32/1/2'::knx_group_address3;

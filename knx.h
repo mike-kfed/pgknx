@@ -23,8 +23,8 @@ typedef uint16 knx_addr;
 
 #define KNX_ADDR_FORMAT UINT16_FORMAT
 
-#define PG_GETARG_KNX_ADDR(n) PG_GETARG_INT16(n)
-#define PG_RETURN_KNX_ADDR(x) PG_RETURN_INT16(x)
+#define PG_GETARG_KNX_ADDR(n) PG_GETARG_UINT16(n)
+#define PG_RETURN_KNX_ADDR(x) PG_RETURN_UINT16(x)
 
 extern void initialize(void);
 
