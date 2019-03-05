@@ -226,6 +226,24 @@ create table knx_test(
 );
 create index on knx_test(b);
 create index on knx_test(c);
+insert into knx_test values ('0/1/2', '1/230', '12.13.14');
+select * from knx_test;
+   a   |   b   |    c     
+-------+-------+----------
+ 0/1/2 | 1/230 | 12.13.14
+(1 row)
+
+-- testing binary protocol send and receive using COPY WITH BINARY
+-- this is commented code to not mess with other peoples filesystem
+-- code in here for reference
+/*
+copy knx_test
+	to '/tmp/pgknx.pgdump'
+	with binary;
+truncate table knx_test;
+copy knx_test from '/tmp/pgknx.pgdump' with binary;
+select * from knx_test;
+*/
 drop table knx_test;
 --
 -- cleanup
