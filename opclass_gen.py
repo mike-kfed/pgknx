@@ -1,5 +1,4 @@
 "generate sql needed for btree and hash operators"
-# flake8: noqa
 
 FAMILY = """
 --
@@ -108,7 +107,7 @@ CREATE OPERATOR <> (
 	NEGATOR = =,
 	RESTRICT = neqsel,
 	JOIN = neqjoinsel);
-"""
+"""  # noqa: W191
 
 OPCLASS_TPL = """
 --
@@ -141,30 +140,33 @@ CREATE OPERATOR CLASS {data_type_name}_ops DEFAULT
 	FOR TYPE {data_type_name} USING hash FAMILY {family_name} AS
 	OPERATOR 1  =,
 	FUNCTION 1  hash_{data_type_name}({data_type_name});
-"""
+"""  # noqa: W191
+
 
 def btree_others(dt_left, others):
-    "generate functions and operators for mix of datatypes."
+    "generate functions and operators for mix of datatypes."  # noqa: E101
     assert others
     assert dt_left not in others
     tpl_func = """
 CREATE FUNCTION bt_{dt_left}_cmp({dt_left}, {other})
-	RETURNS int4
-	AS 'btint4cmp'
-	LANGUAGE 'internal'
-	IMMUTABLE STRICT
-	PARALLEL SAFE;
+\tRETURNS int4
+\tAS 'btint4cmp'
+\tLANGUAGE 'internal'
+\tIMMUTABLE STRICT
+\tPARALLEL SAFE;
 """
-    comment = "-- {dt_left} vs other types:\n"
     functions = ""
     other_ops = ""
     operators = []
     bt_op_funcs = []
     for other in others:
-        other_ops += TPL.format(family_name=family_name, data_type_name=dt_left, r_data_type_name=other)
+        other_ops += TPL.format(family_name=family_name, data_type_name=dt_left,
+                                r_data_type_name=other)
         functions += tpl_func.format(dt_left=dt_left, other=other)
         operators.append((dt_left, other))
-        bt_op_funcs.append("\tFUNCTION 1  bt_{dt_left}_cmp({dt_left}, {other})".format(dt_left=dt_left, other=other))
+        bt_op_funcs.append("\tFUNCTION 1  bt_{dt_left}_cmp({dt_left}, {other})".format(
+            dt_left=dt_left,
+            other=other))
     op_defs = []
     for op_num, op_code in [(1, '<'), (2, '<='), (3, '='), (4, '>='), (5, '>')]:
         for dt_left, other in operators:
@@ -196,6 +198,7 @@ ALTER OPERATOR FAMILY {family_name} USING hash ADD
         hash_ops=",\n".join(hash_ops),
         )
 
+
 family_name = 'knx_ops'
 type_names = ['knx_group_address3',
               'knx_group_address2',
@@ -204,7 +207,8 @@ type_names = ['knx_group_address3',
 with open('knx-operators.sql', 'w') as opf:
     opf.write(FAMILY.format(family_name=family_name))
     for type_name in type_names:
-        opf.write(TPL.format(family_name=family_name, data_type_name=type_name, r_data_type_name=type_name))
+        opf.write(TPL.format(family_name=family_name, data_type_name=type_name,
+                             r_data_type_name=type_name))
         opf.write(OPCLASS_TPL.format(family_name=family_name, data_type_name=type_name))
     for dt_left in type_names:
         all_except_self = type_names[:]
