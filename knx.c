@@ -32,6 +32,7 @@ enum knx_type
 /*static const char *const knx_names[] = {"invalid", "KNX Address", "Group Address Level 3", "Group Address Level 2", "Individual Address"};*/
 
 const size_t MAX_ADDR_LEN = 12;
+enum { MAX_ADDR_LEN_BUF = 13 };
 
 /*----------------------------------------------------------
  * Formatting and conversion routines.
@@ -142,7 +143,7 @@ knx_ga3_out(PG_FUNCTION_ARGS)
 {
 	knx_addr	val = PG_GETARG_KNX_ADDR(0);
 	char	   *result;
-	char		buf[MAX_ADDR_LEN + 1];
+	char		buf[MAX_ADDR_LEN_BUF];
 
 	(void) group_addr2string(val, false, buf);
 
@@ -167,7 +168,7 @@ knx_ga2_out(PG_FUNCTION_ARGS)
 {
 	knx_addr	val = PG_GETARG_KNX_ADDR(0);
 	char	   *result;
-	char		buf[MAX_ADDR_LEN + 1];
+	char		buf[MAX_ADDR_LEN_BUF];
 
 	(void) group_addr2ga2string(val, false, buf);
 
@@ -232,7 +233,7 @@ knx_ia_out(PG_FUNCTION_ARGS)
 {
 	knx_addr	val = PG_GETARG_KNX_ADDR(0);
 	char	   *result;
-	char		buf[MAX_ADDR_LEN + 1];
+	char		buf[MAX_ADDR_LEN_BUF];
 
 	(void) individual_addr2string(val, false, buf);
 
